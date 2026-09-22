@@ -1,0 +1,238 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{fullpage}
+\usepackage[top=2cm, bottom=4.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{lastpage}
+\usepackage{ulem}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\colorlet{darkblue}{blue!60!black}
+
+\newcommand{\abs}[1]{\left\vert #1 \right\vert}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\text{Var}\,}
+
+
+\renewcommand{\tt}[1]{\texttt{#1}}
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.05in}
+% Edit these as appropriate
+\newcommand\course{CSCI 1550 / 2540}
+\newcommand\hwnumber{1}             % <-- homework number
+\newcommand\Namea{Partner 1}           % <-- Name of partner #1
+\newcommand\Nameb{Partner 2}    
+\newcommand\Namec{Partner 3}  
+\newcommand{\DUEDATE}{September 24, 2026}
+\usepackage{subfiles} % Best loaded last in the preamble
+\usepackage[most]{tcolorbox}
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Milan Capoor}
+\chead{\textbf{\Large Homework \hwnumber}}
+\rhead{\course \\ September 17, 2026}
+\lfoot{}
+\cfoot{}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\begin{document}
+\begin{center}
+    \vspace{10pt}
+    \textit{Due:} \DUEDATE\\
+    Remember to show your work for each problem to receive full credit.
+\end{center}
+\section*{Problem 1}
+
+The following approach is often called \textit{reservoir sampling}.  Suppose we have a sequence of items passing by one at a time.  We want to maintain a sample of one item with the property that at each step it is uniformly distributed over all the items that we have seen up to this step.  Moreover, we want to accomplish this without knowing the total number of items in advance or storing all of the items that we see.
+
+Consider the following algorithm, which stores just one item in memory at all times.  When the first item appears, it is stored in the memory.  When the $k$th item appears, it replaces the item in memory with probability $1/k$.  Explain why this algorithm solves the problem.
+
+\color{darkblue}
+    At $k = 1$, the first item is stored in memory with probability $1/1 = 1$.  
+    
+    At $k = 2$, the second item replaces the first item with probability $1/2$, so each of the two items has probability $1/2$ of being in memory.  
+    
+    Suppose that before seeing the $k$-th item, each of the $k-1$ items has probability $1/(k-1)$ of being in memory (i.e. we have successfully followed the algorithm up to this point). When the $k$-th item appears, it replaces the item in memory with probability $1/k$. Thus, each of the first $k-1$ items has probability 
+    \[\frac{1}{k-1} \cdot \left(1 - \frac{1}{k}\right) = \frac{1}{k-1} - \frac{1}{k(k-1)} = \frac{k-1}{k(k-1)} = \frac{1}{k}\]
+    of remaining in memory so all $k$ seen items are uniformly distributed in memory.  
+    
+    By induction, this algorithm maintains a uniform distribution of the items in memory at each step.
+\color{black}
+
+
+\section*{Problem 2:}
+Use the analysis of the randomized Min-Cut algorithm to
+show that any connected undirected graph $G$ on $n$ vertices has at most $\frac{n(n-1)}{2}$ distinct minimum cuts.
+
+\color{darkblue}
+   From the analysis of the randomized Min-Cut algorithm, we know that the probability of finding a specific minimum cut in a connected undirected graph $G$ on $n$ vertices is  $\geq \frac{2}{n(n-1)}$.
+
+   Notice that finding a specific minimum cut is a mutually exclusive event from finding any other minimum cut. Thus, if there were $k \geq \frac{n(n-1)}{2}$ distinct min cuts, 
+   \[\sum_k \P(\text{finding min-cut } k) \geq \frac{n(n-1)}{2} \cdot \frac{2}{n(n-1)} = 1\]
+    which is a contradiction since the sum of probabilities of mutually exclusive events cannot exceed 1. 
+
+    
+\color{black}
+
+
+\section*{Problem 3:}
+View the condition $Dr = 0$ in the proof of Freivalds' Algorithm for matrix multiplication as a system of $n$ linear multivariate polynomials of degree 1 over variables $r_1, \dots, r_n$. Use the Schwartz-Zippel Lemma to give an alternative 2-line proof that $\mathbb{P}(Dr = 0) \le 1/\vert{}S\vert{}$ when $r \in S^n$.
+
+\color{darkblue}
+    Let $H_1, \dots, H_n$ be the $n$ linear multivariate polynomials of degree 1 over variables $r_1, \dots, r_n$ corresponding to the $n$ equations in the system $Dr = 0$.
+
+    Assume that $H_1, \dots, H_n$ are not all identically zero. Then by the Schwartz-Zippel Lemma, for each $i$, $\P(\mathcal{H}_i) := \P(H_i(r_1, \dots, r_n) = 0) \leq 1/\abs S$. So
+    \[\P(Dr = 0) = \P\left(\bigcap_{i=1}^n \mathcal{H}_i\right) = \prod_{i=1}^n \P(H_i(r_1, \dots, r_n) = 0) \leq \left(\frac{1}{\abs S}\right)^n \leq \frac{1}{\abs S}\]
+\color{black}
+
+
+
+
+
+\section*{Problem 4:}
+Consider the following algorithm for 
+finding the $k$-smallest element in a set $S$:
+\begin{tcolorbox}[standard jigsaw,
+	opacityback=0,
+	breakable
+	]
+{\bf Procedure Select($S,k$)};
+
+{\bf Input:} A set $S$, an integer $k\leq |S|=n$.
+
+{\bf Output:} The $k$ smallest element in the set $S$.
+
+\begin{enumerate}
+\item If $|S|\leq 24$ sort $S$ and return the $k$ smallest element. STOP.
+\item
+Choose a random element $y$ uniformly from $S$.
+\item
+Compare all elements of $S$ to $y$. Let 
+$S_1= \{x\in S ~|~ x\leq y\}$ and 
+$S_2 =\{x\in S ~|~ x> y\}.$
+\item
+If $k\leq |S_1|$ return Select($S_1,k)$ else return Select($S_2,k-|S_1|$).
+\end{enumerate}
+\end{tcolorbox}
+
+We analyze the performance of the algorithm. Answer the following questions for $|S|=n$. You can ignore the cost of step 1 which is $O(1)$. 
+\begin{enumerate}
+\item 
+We say that a call to Select$(S,k$) was {\it successful} if both $|S_1|\leq 2n/3$ and $|S_2|\leq 2n/3$. Prove that 
+the algorithm terminates after no more than $\log_{3/2} n$ successful calls.
+
+\color{red}
+    Let $i$ be the number of successful calls. 
+
+    At $i = 1$, $S_1$ and $S_2$ partition $S$ into two sets of size at most $2n/3$. $y$ must be in one of these sets, so the next call to \tt{Select} will be on a set of size at most $2n/3$.
+
+    Then at $i =2$, we again partition the set into a two sets of size at most 
+    \[\frac{2(2n/3)}{3} = \frac{4n}{9} = \left(\frac{2}{3}\right)^2 n\]
+
+    Inductively, after $i$ successful calls, the size of the set on which \tt{Select} is called is at most 
+    \[\frac{2}{3} \cdot \left(\frac{2}{3}\right)^{i-1} n = \left(\frac{2}{3}\right)^i n\]
+
+    
+\color{black}
+
+
+\item 
+Prove that a call to the algorithm if $|S|=n\geq 24$ is successful with probability $\geq 1/4$. [Hint: $2n/3$ may not be an integer. ]
+
+\color{red}
+    \begin{align*}
+        \P(\text{success}) &= \P(|S_1| \leq 2n/3 \text{ and } |S_2| \leq 2n/3)\\ 
+        &=\P(\#\{x \in S : x \leq y\} \leq 2n/3 \text{ and } \#\{x \in S : x > y\} \leq 2n/3)\\
+    \end{align*}
+    
+\color{black}
+
+\item 
+Let $\tilde{Y}_i$ be the number of calls  between the $i$-th successful call (excluded) and the $i+1$-th (inluded). 
+Let $Y_i$ be a geometric random variable with parameter $p=1/4$. 
+Argue (formally or informally) that for the analysis of the algorithm's runtime we can use $Y_i$ as an upper bound on $\tilde{Y_i}$
+
+[{\bf Hint:} We say that $\tilde{Y}_i$ is \textbf{stochastically bounded} by $Y_i$,
+if for any $j$ in the domain of $Y_i$ we have
+$$\Pr(\tilde{Y}_i \leq j) \geq \Pr(Y_i \leq j).$$  Show that this is the case here, and that it implies that $E[\tilde{Y_i}]\leq E[Y_i]$.]
+
+\color{red}
+    First note, that $\P(Y_i \leq j)$ is just the CDF of a geometric random variable with parameter $p=1/4$:
+    \[\P(Y_i \leq j) = 1 - \left(\frac{3}{4}\right)^{j} \]
+    
+    Then 
+    \[\P(\tilde Y_i \leq j) = \P(Y_i = 1) + \sum_{k=2}^j \P(Y_i = k \; | \; Y_i \geq k-1)\]
+\color{black}
+
+We continue the analysis assuming that for all $i$, the number of calls 
+between the $i$-th successful call (excluded) and the $i+1$-th successful call (included) is distributed according to $Y_i$.
+
+\item 
+Let $X_i$ be the number of comparisons between the $i$-th successful call (excluded) and the $i+1$-th (inluded). Argue that for the analysis of the algorithm's performance, $X_i$ is bounded by $n(2/3)^i Y_i$, and  that $E[X_i] \leq n(2/3)^i E[Y_i] = 4n(2/3)^i$.
+
+\color{darkblue}
+    First, by definition of a geometric random variable, $E[Y_i] = 1/p = 4$. 
+
+    Hence, by part 3, it suffices to show that $X_i$ is bounded by $n\left(\frac{2}{3}\right)^i Y_i$.
+
+    Then, recall from part 1 that $n\left(\frac{2}{3}\right)^i$ is the size of the set on which \tt{Select} is called after $i$ successful calls. Since each call to \tt{Select} requires at most $n\left(\frac{2}{3}\right)^i$ comparisons, and there are at most $Y_i$ calls between the $i$-th and $i+1$-th successful calls, we have that
+    \[X_i \leq n\left(\frac{2}{3}\right)^i Y_i\]
+\color{black}
+
+We continue the analysis assuming that $X_i = n(2/3)^i Y_i$.
+
+\item Let $X=\sum_{i\geq 1}X_i$. Prove that $E[X]$ is bounded by $12n$.
+
+\color{darkblue}
+    \begin{align*}
+        \E[X] &= \sum_{i \geq 1} \E[X_i]\\ 
+        &\leq \sum_{i \geq 1} 4n(2/3)^i\\
+        &= 4n \sum_{i \geq 1} (2/3)^i\\
+        &= 4n \cdot \frac{1}{1 - 2/3}\\ 
+        &= 4n \cdot 3 = 12n
+    \end{align*}
+\color{black}
+
+\item Derive upper bounds for $Var[Y_i]$ and $Var[X_i]$.
+
+\color{darkblue}
+    \begin{align*}
+        \Var[Y_i] &= \frac{1-p}{p^2} = \frac{3/4}{(1/4)^2} = 12\\
+        \Var[X_i] &= n^2 (2/3)^{2i} \Var[Y_i]\\ 
+        &= 12 n^2 (2/3)^{2i}
+    \end{align*}
+\color{black}
+
+\item Prove that $Var[X]\leq \sum_{i=0}^{\log_{3/2}n}  n^{2} (2/3)^{2i}  Var[Y_i] \leq 21.6 n^{2} $ 
+
+\color{red}
+    \begin{align*}
+        \Var X &= \Var\left(\sum_{i \geq 1} X_i\right)\\
+        &= \sum_{i \geq 1} \Var[X_i]\\
+        &= \sum_{i \geq 1} 12n^2 (2/3)^{2i}\\
+        &= \sum_{i = 1}^{\lfloor\log_{3/2} n\rfloor} 12n^2 (2/3)^{2i} + \sum_{i = \lfloor\log_{3/2} n\rfloor + 1}^{\infty} 12n^2 (2/3)^{2i}\\
+    \end{align*}
+\color{black}
+
+
+\item Apply Chebyshev's inequality to prove that with probability $\geq 0.85$ the algorithm executes no more than $24n$ comparisons. 
+
+\color{darkblue}
+    Chebyshev's inequality gives that 
+    \[\P(|X - \E[X]| \geq k\sqrt{\Var[X]}) \leq \frac{1}{k^2}\]
+
+    Then letting $k = \sqrt{20/3}$, we have that 
+    \[\P(|X - 12n| \geq \sqrt{\frac{20}{3} \Var[X]}) =  \P(\abs{X - 12n} \geq 12n) \leq 0.15\]
+    and 
+    \[\P(X \geq 24n) \leq 0.15 \implies \P(X \leq 24n) \geq 0.85\]
+\color{black}
+
+\end{enumerate}
+
+
+\end{document}
