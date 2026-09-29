@@ -1,0 +1,237 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{fullpage}
+\usepackage[top=2cm, bottom=4.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{lastpage}
+\usepackage{ulem}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\colorlet{darkblue}{blue!60!black}
+
+\newcommand{\abs}[1]{\left\vert #1 \right\vert}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\text{Var}\,}
+
+
+\renewcommand{\tt}[1]{\texttt{#1}}
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.05in}
+% Edit these as appropriate
+\newcommand\course{CSCI 1550 / 2540}
+\newcommand\hwnumber{2}             % <-- homework number
+\newcommand{\DUEDATE}{October 1, 2026}
+\usepackage{subfiles} % Best loaded last in the preamble
+\usepackage[most]{tcolorbox}
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{Milan Capoor}
+\chead{\textbf{\Large Homework \hwnumber }}
+\rhead{\course \\ September 24, 2026}
+\lfoot{}
+\cfoot{}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\begin{document}
+\begin{center}
+    \vspace{10pt}
+    \textit{Due:} \DUEDATE\\
+    Remember to show your work for each problem to receive full credit.
+\end{center}
+\section*{Problem 0}
+Finish Problem 4 from HW 1.
+
+\color{darkblue}
+    See HW 1. 
+\color{black}
+
+
+\section*{Problem 1}
+
+Suppose that we have an algorithm that takes as input a string of $n$ bits. We are told that if the input bits are chosen independently and uniformly at random, the expected running time is $O(n^2)$. What can Markov's inequality tell us about the worst-case running time of this algorithm on inputs of size $n$? [\textbf{Hint:} What is the sample space? What is the smallest probability of any event in that sample space?]
+
+\color{darkblue}
+    Let $X$ be the random variable representing the running time of the algorithm on a random input of size $n$, so $\mathbb{E}[X] = O(n^2)$.
+
+    Let $t$ be the worst-case running time of the algorithm on inputs of size $n$, so $\P(X \geq t) \geq \frac{1}{2^n}$ since the $n$ bits are chosen independently and uniformly at random.
+
+    Markov's inequality states that for a non-negative random variable $X$ and any $a > 0$, 
+    \[\P(X \geq a) \leq \frac{\mathbb{E}[X]}{a}\]
+    so in particular, 
+    \[\frac{1}{2^n} \leq \P(X \geq t) \leq \frac{O(n^2)}{t}\]
+    which means 
+    \[t \leq O(n^2) 2^n\]
+
+\color{black}
+
+\section*{Problem 2}
+\begin{enumerate}[a.]
+    \item Define a random variable $X$ and a value $c$ for which the Markov inequality is tight, i.e.
+    $\Pr(X\geq c\mathbb{E}[X])=\frac{1}{c}$. [Hint: you can use a two point random variable, i.e. a random variable that gives non-zero probability to only 2 values.]
+
+
+    \color{darkblue}
+        Let $X \sim \text{Bernoulli}(1/2)$. Then $\E[X] = 1/2$ and letting $c = 2$, we have
+        \[\P(X \geq 1) = \P(X > 1) + \P(X = 1) = \frac{1}{2}\]
+    \color{black}
+
+    \item Define a random variable $X$ and a value $c$ for which the Chebyshev inequality is tight, i.e.
+    $\Pr(|X-E[X]|\geq c)=\frac{\operatorname{Var}{X}}{c^2}$. [Hint: you can use a two point random variable with expectation 0.]
+
+    \color{darkblue}
+        Let $Y \sim \text{Bernoulli}(1/2)$ and let $X = Y - \frac{1}{2}$. Then $\E[X] = \E[Y] - \E[1/2] = 0$ and $\Var(Y) = \Var(X) = 1/4$. Let $c = 1/2$. Then
+        \begin{align*}
+            \P(\abs{X - \E[X]} \geq \frac{1}{2}) &= \P(X - \E[X] \geq \frac{1}{2}) + \P(X - \E[X] \leq -\frac{1}{2})\\ 
+            &= \P(X \geq \frac{1}{2}) + \P(X \leq -\frac{1}{2})\\
+            &= \P(X = \frac{1}{2}) + \P(X = -\frac{1}{2})\\
+            &= \frac{1}{2} + \frac{1}{2} = 1 = \frac{1/4}{(1/2)^2}\\ 
+            &= \frac{\Var(X)}{c^2}
+        \end{align*}
+    \color{black}
+        
+    \item Show an example for which the Markov inequality is not tight. [Hint: you can use a (continuous or discrete) uniform random variable.]
+    
+    \color{darkblue}
+        Let $X \sim \text{Uniform}(0,1)$. Then $\E[X] = 1/2$. However, by Markov's inequality, we have
+        \[\P(X \geq \frac{1}{2}) = \frac{1}{2} \leq \frac{\E[X]}{1/2} = 1\]
+    \color{black}
+
+     \item Show an example for which the  Chebyshev inequality is not tight. [Hint: you can use a (continuous or discrete) uniform random variable with expectation 0.]
+     
+     \color{darkblue}
+        Let $X \sim \text{Uniform}(-1,1)$. Then $\E[X] = 0$ and $\Var(X) = 1/3$. However, by Chebyshev's inequality, we have
+        \[\P(\abs{X - \E[X]} \geq 1) = \P(\abs{X} \geq 1) = 0 \leq \frac{\Var(X)}{1^2} = \frac{1}{3}\]
+     \color{black}
+
+   
+\end{enumerate}
+
+
+\section*{Problem 3}
+
+Suppose that each draw independently produces one of $n$ coupon types, chosen uniformly at random, where $n\geq 4$ is even. For a positive integer $m$, define $H_m=\sum_{i=1}^{m}\frac{1}{i}$. You may use the bound $\ln m\leq H_m\leq \ln m+1$.
+
+Let $X$ be the number of draws until we have collected $n/2$ distinct coupon types. Before any draws are made, fix a particular set of $n/2$ coupon types, and let $Y$ be the number of draws until we have collected every coupon type in this fixed set.
+
+\begin{enumerate}[a.]
+    \item Compute $\mathbb{E}[X]$ and $\mathbb{E}[Y]$ in terms of $H_n$ and $H_{n/2}$. Give the asymptotic order of each expectation as $n\to\infty$.
+    
+    \color{darkblue}
+        First notice $Y$ is the sum of $n/2$ geometric random variables representing the number of draws needed to collect each of the $n/2$ coupon types in the fixed set, so the $i$-th geometric random variable has success probability $\frac{n/2-i+1}{n}$. Therefore, we have
+        \[\E[Y] = \sum_{i=1}^{n/2} \frac{n}{n/2-i+1} = n\sum_{j=1}^{n/2} \frac{1}{j} = nH_{n/2} = \Theta(n\log n)\]
+        where $j = n/2-i+1$ and $j$ goes from $n/2$ to $1$ as $i$ goes from $1$ to $n/2$.
+
+        Similarly, $X$ is the sum of $n/2$ geometric random variables representing the number of draws needed to collect each of the $n/2$ distinct coupon types but now the $i$-th geometric random variable has success probability $\frac{n-i+1}{n}$ since it suffices to collect any of the remaining $n-i+1$ coupon types. Therefore, we have
+        \[\E[X] = \sum_{i=1}^{n/2} \frac{n}{n-i+1} = n\sum_{j=n/2}^{n} \frac{1}{j} = n(H_n - H_{n/2}) = \Theta(n\log 2) = \Theta(n)\]
+        where $j = n-i+1$ and $j$ goes from $n$ to $n/2$ as $i$ goes from $1$ to $n/2$.
+
+    \color{black}
+
+
+    \item Express $Y$ as a sum of independent geometric random variables. Compute $\operatorname{Var}(Y)$ and show that
+    \[
+    \operatorname{Var}(Y)\leq \frac{\pi^2 n^2}{6}.
+    \]
+    You may use $\sum_{i=1}^{\infty}\frac{1}{i^2}=\frac{\pi^2}{6}$.
+
+    \color{darkblue}
+        We showed above that $Y = \sum_{i=1}^{n/2} Y_i$ where $Y_i$ is a geometric random variable with success probability $\frac{n/2-i+1}{n}$. Therefore, we have
+        \begin{align*}
+            \Var(Y) &= \sum_{i=1}^{n/2} \Var(Y_i)\\ 
+            &= \sum_{i=1}^{n/2} \frac{1 - \frac{n/2-i+1}{n}}{\left(\frac{n/2-i+1}{n}\right)^2}\\ 
+            &= \sum_{i=1}^{n/2} \frac{n - (n/2-i+1)}{(n/2-i+1)^2} n\\
+            &= \sum_{i=1}^{n/2} \frac{n/2+i-1}{(n/2-i+1)^2} n\\
+            &\leq \sum_{i=1}^{n/2} \frac{n/2+n/2-1}{(n/2-i+1)^2} n\\
+            &\leq \sum_{i=1}^{n/2} \frac{n}{(n/2-i+1)^2} n\\
+            &= n^2 \sum_{j=1}^{n/2} \frac{1}{j^2} \leq n^2 \sum_{j=1}^{\infty} \frac{1}{j^2} = n^2 \frac{\pi^2}{6} = \frac{\pi^2 n^2}{6}
+        \end{align*}
+        where $j = n/2-i+1$.
+        
+    \color{black}
+
+
+    \item Let $t_n=\left\lceil 2nH_{n/2}\right\rceil$. Use Markov's inequality and Chebyshev's inequality separately to give upper bounds on $\Pr(Y>t_n)$. Compare the asymptotic orders of the two bounds.
+    
+    \color{darkblue}
+        From Markov's inequality, we have
+        \[\P(Y > t_n) \leq \frac{\E[Y]}{t_n} \leq \frac{nH_{n/2}}{2nH_{n/2}} = \frac{1}{2} = O(1)\]
+
+        From Chebyshev's inequality, we have
+        \begin{align*}
+            \P(Y > t_n) &= \P(Y - \E[Y] > t_n - \E[Y])\\ 
+            &\leq \P(\abs{Y - \E[Y]} > t_n - \E[Y])\\ 
+            &\leq \frac{\Var(Y)}{(t_n - \E[Y])^2}\\ 
+            &\leq \frac{\pi^2 n^2 / 6}{(2nH_{n/2} - nH_{n/2})^2} = \frac{\pi^2 n^2 / 6}{(nH_{n/2})^2} = \frac{\pi^2}{6H_{n/2}^2} = O\left(\frac{1}{\log^2 n}\right)
+        \end{align*}
+        
+    \color{black}
+
+
+    \item Give a direct bound on $\Pr(Y>t)$ by considering, for each coupon type in the fixed set, the event that it has not appeared in the first $t$ draws. Prove that for every integer $t\geq 0$,
+    \[
+    \Pr(Y>t)\leq \frac{n}{2}\left(1-\frac{1}{n}\right)^t\leq \frac{n}{2}e^{-t/n}.
+    \]
+    Apply this bound with $t=t_n$ and compare it with the bounds obtained in part (c).
+
+
+    \color{darkblue}
+        First, let $A_i$ be the event that the $i$-th coupon type in the fixed set did not appear in the first $t$ draws. Then we have
+        \begin{align*}
+            P(Y > t) &= \P( \bigcup_{i=1}^{n/2} A_i )\\ 
+            &\leq \sum_{i=1}^{n/2} \P(A_i)\\ 
+            &\leq \sum_{i=1}^{n/2} \left(1 - \frac{1}{n}\right)^t\\ 
+            &\leq \frac{n}{2} \left(1 - \frac{1}{n}\right)^t\\ 
+            &\leq \frac{n}{2}e^{-t/n}
+        \end{align*} 
+        where the final line follows from the fact that $1-x \leq e^{-x}$ for all $x$.
+
+        Then with $t = t_n$, 
+        \[P(Y > t_n) \leq \frac{n}{2}e^{-t_n/n} \leq \frac{n}{2}e^{-2H_{n/2}} \leq \frac{n}{2} e^{-2(\log n/2)} \leq \frac{n}{2} \cdot \frac{4}{n^2} = \frac{2}{n} = O\left(\frac{1}{n}\right)\]
+
+        So the bound from part (d) is asymptotically tighter than the bounds from part (c).
+    \color{black}
+
+\end{enumerate}
+
+\section*{Problem 4}
+Company G hires new employees only if they are better than their top current employees.
+The company scores employees in a range $[0,1]$, where $0$ is the best possible employee and $1$ is the worst. The scores of candidates interviewed by the company are independent and uniformly distributed in the range $[0,1]$.
+
+Let $r_i$ denote the score of the $i$-th hired employee in the company, and assume that  $r_1$, was distributed uniformly in the range $[0,1]$.
+\begin{enumerate}
+\item Compute $E[r_2]$.
+
+\color{darkblue}
+    We know $r_2 \sim \text{Unif}(0, r_1)$ and $r_1 \sim \text{Unif}(0, 1)$. Therefore, we have
+    \[ \E[r_2] = \E_{r_1}[\E_{r_2}[r_2 | r_1]] = \E\left[\frac{r_1}{2}\right] = \frac{1}{2}\E[r_1] = \frac{1}{2}\cdot\frac{1}{2} = \frac{1}{4}\]
+\color{black}
+
+\item Compute $E[r_k]$
+
+\color{darkblue}
+    Given $r_1, \dots, r_{k-1}$, we know that $r_k \sim \text{Unif}(0, r_{k-1})$. So,
+    \[\E[r_k] = \E_{r_{k-1}}[\E_{r_k}[r_k | r_{k-1}]] = \E\left[\frac{r_{k-1}}{2}\right] = \frac{1}{2}\E[r_{k-1}] = \frac{1}{2^k}\]
+\color{black}
+
+\item Let $T_{k+1}$ be the number of candidates interviewed for the $k+1$ hire.
+It's not easy to compute $E[T_{k+1}]=E[\frac{1}{r_k}]$. Use Markov inequality (on $r_k$) to prove a lower bound $2^{k-2}$ for this expectation.
+
+\color{darkblue}
+    First notice 
+    \[\P(r_k \geq 2^{-(k-1)}) \leq \frac{\E[r_k]}{2^{-(k-1)}} = \frac{2^{-k}}{2^{-(k-1)}} = \frac{1}{2}\]
+    so 
+    \[\E[1/r_k] \geq 2^{k-1} \cdot \P\left(\frac{1}{r_k}\geq 2^{k-1}\right)= \frac{1}{2} \cdot 2^{k-1} = 2^{k-2}\]
+
+\color{black}
+
+
+
+\end{enumerate}
+
+
+\end{document}

@@ -707,4 +707,434 @@ This gives us an easier way to compute the expectation of $X \sim G(p)$:
     \[\E[X] = (1 - p) \E[Z + 1] + p = (1- p) \E[Z] + 1 \implies \E[X] = \frac{1}{p}\]
 \end{tbox}
 
+\section{Sept 24}
+
+\tbf{Recall:} In the \emph{Coupon Collector Problem,} we place balls independently and uniformly at random into $n$ bins. We continue until every bin has at least one ball. How many balls do we expect to place? 
+
+Last time, we showed that 
+\[X = \sum_{i=1}^n X_i\]
+where $X_i$ is a geometric random variable with success probability $p_i = 1 - \frac{i-1}{n}$ representing the number of trials till we hit a new bin when there were already $i-1$ non-empty bins.
+
+\begin{tbox}{\textbf{Lemma:} Let $X$ be a discrete random variable that takes on only non-negative integer values. Then
+    \[\E[X] = \sum_{i=1}^{\infty} \P(X \geq i)\]  }
+    \emph{Proof:} 
+
+    \begin{align*}
+        \sum_{i=1}^{\infty} \P(X \geq i) &= \sum_{i=1}^{\infty} \sum_{j=i}^{\infty} \P(X = j)\\
+        &= \sum_{j=1}^{\infty} \sum_{i=1}^{j} \P(X = j)\\
+        &= \sum_{j=1}^{\infty} j \P(X = j)\\
+        &= \E[X]
+    \end{align*}
+\end{tbox}
+
+By the lemma and the fact that $X \sim G(p)$, 
+\begin{align*}
+    \P(X \geq i) &= \sum_{n=i}^{\infty} (1-p)^{n-1} p\\
+    &= (1 - p)^{i-1}\\ 
+    \E[X] &= \sum_{i=1}^{\infty} \P(X \geq i)\\ 
+    &= \sum_{i=1}^{\infty} (1 - p)^{i-1}\\
+    &= \frac{1}{1 - (1-p)}\\
+    &= \frac{1}{p}
+\end{align*}
+giving exactly the same result as the proof by the memoryless property.
+
+\begin{exercise}
+    \textbf{Exercise:} Prove that for $X$ a continuous random variable, 
+    \[\E[X] = \int_0^{\infty} \P(X \geq y) \; dy\]
+\end{exercise}
+
+Back to the Coupon Collector Problem, we have
+\[\E[X_i] = \frac{1}{p_i} = \frac{1}{1 - \frac{i-1}{n}}\]
+so 
+\begin{align*}
+    \E[X] &= \sum_{i=1}^{n} \E[X_i]\\
+    &= \sum_{i=1}^{n} \frac{n}{n - i + 1}\\
+    &= nH_n\\
+    &= n\log n + O(n)
+\end{align*}
+where the final step follows from the fact that 
+\[H_n = \sum_{i=1}^{n} 1/i = \log n + O(1)\]
+
+Letting $X(\alpha)$ be the number of balls placed until $\alpha n$ bins are filled, we have
+\begin{align*}
+    \E[X(\alpha)] &= \sum_{i=1}^{\alpha n} \frac{n}{n-i+1}\\ 
+    &\approx \sum_{i=(1 - \alpha)n }^{n} \frac{n}{i}\\
+    &= n\left(\sum_{i=1}^n \frac{1}{i} - \sum_{i=1}^{(1-\alpha)n} \frac{1}{i}\right)\\ 
+    &= n\log \frac{1}{1 - \alpha} 
+\end{align*}
+In particular, this means that as long as we only want to fill a constant fraction of the bins, we only need to place $O(n)$ balls. If we want to fill all the bins, however, we need to place $n \log n$ balls.
+
+\tbf{Motivation:} Suppose you have two job offers from a big company and a startup with stock options. The big company has a salary of \$100k and the startup has a salary of \$50k plus with stock options that will be worth \$5M with probability $1/100$. Which should you choose?
+
+Under the expected value criterion, the two offers are equivalent. However, the startup has a much higher \emph{risk.} How might we quantify this risk? 
+
+\begin{tbox}{\textbf{Markov Inequality:} For any non-negative random variable $X$ and any $a > 0$,
+    \[\P(X \geq a) \leq \frac{\E[X]}{a}\]}
+    \emph{Proof:} 
+    Intuitively, if the expected value of $X$ is small, then the mass of the distribution must be concentrated on small values. 
+
+    \[\E[X] = \sum i\P(X = i) \geq a \sum_{i \geq a} \P(X= i) = a\P(X\geq a)\] 
+\end{tbox}
+
+In the coupon collector problem, we found $\E[X] = nH_n = n\log n + O(n)$. What is the probability that we are very unlucky? By Markov's inequality,
+\[\P(X \geq 2\E[X]) \leq \P(X \geq 2n\log n) \leq \frac{1}{2}\]
+
+This is helpful but we can do better. This will also motivate another essential theme for this class: \emph{with more information, we can make tighter bounds.} 
+
+\tbf{Variance:} $\Var(X) = \E[(X - \E[X])^2] = \E[X^2] - (\E[X])^2$
+
+Intuitively, we want the expectation of the deviation
+\[\sum (i - \E[X]) p_i(x)\]
+but of course, this is always zero. Hence, we square the deviation to get a non-negative quantity and to avoid working with an absolute value. As we will see, choosing the square also allows the very useful application of moments. 
+
+\begin{exercise}
+    \textbf{Exercise:} Calculate the variance of the following RVs.
+    \begin{enumerate}
+        \item $X \sim \text{Bernoulli}(1/2)$
+        
+        \[\Var X = \frac{1}{2}(1 - \frac{1}{2})^2 + \frac{1}{2}(0 - \frac{1}{2})^2  =\frac{1}{4}\]
+
+        \item $X \sim \text{Unif}(n)$ 
+        \begin{align*}
+            \E[X] &= \frac{1}{n} \sum_{i=1}^{n} i = \frac{n+1}{2}\\
+            \E[X^2] &= \frac{1}{n} \sum_{i=1}^{n} i^2 = \frac{(n+1)(2n+1)}{6}\\
+            \Var(X) &= \E[X^2] - (\E[X])^2 = \frac{(n+1)(2n+1)}{6} - \frac{(n+1)^2}{4} = \frac{n^2 - 1}{12}
+        \end{align*}
+    \end{enumerate}
+\end{exercise}
+
+Notice that the variance is always non-negative so in particular, $\E[X^2] \geq (\E[X])^2$.
+
+\emph{Standard Deviation:} $\sigma(X) = \sqrt{\Var(X)}$
+
+\begin{tbox}{\textbf{Chebyshev's Inequality:} For any random variable $X$,
+    \[\P(\abs{X - \E[X]} \geq a) \leq \frac{\Var(X)}{a^2}\]}
+    \emph{Proof:} 
+    \[\P(\abs{X - \E[X]} \geq a) = \P((X - \E[X])^2 \geq a^2)\]
+
+    Now our RV $(X - \E[X])^2$ is non-negative so we can apply Markov's inequality to get
+    \[\P((X - \E[X])^2 \geq a^2) \leq \frac{\E[(X - \E[X])^2]}{a^2} = \frac{\Var(X)}{a^2}\]
+\end{tbox}
+
+\begin{proposition}
+    \textbf{Corollaries:} For any random variables, 
+    \begin{enumerate}
+        \item \[\P(\abs{X - \E[X]} \geq a\sigma(X)) \leq \frac{1}{a^2}\]
+        \item \[\P(\abs{X - \E[X]} \geq \ep \E[X]) \leq \frac{\Var[X]}{\ep^2 (\E[X])^2}\]
+    \end{enumerate} 
+\end{proposition}
+
+\begin{tbox}{\textbf{Theorem:} For $X, Y$ independent random variables, \[\E[XY] = \E[X] \cdot \E[Y]\]}
+    \emph{Proof:} 
+    \begin{align*}
+        \E[XY] &= \sum_i \sum_j ij \P(X = i \land Y = j)\\ 
+        &= \sum_{i} \sum_j ij \P(X = i) \P(Y = j)\\ 
+        &= \left(\sum_i p_i \P(X = i)\right)\left(\sum_j \P(Y = j)\right)\\ 
+        &= \E[X] \cdot \E[Y]
+    \end{align*}
+\end{tbox}
+
+\begin{tbox}{\textbf{Theorem:} If $X, Y$ are independent random variables, then \[\Var(X + Y) = \Var(X) + \Var(Y)\]}
+    \emph{Proof:} 
+
+    \begin{align*}
+        \Var[X + Y] &= \E[(X + Y - \E[X] - \E[Y])^2]\\
+        &= \E[(X - \E[X])^2 + (Y - \E[Y])^2 + 2(X - \E[X])(Y - \E[Y])]\\
+        &= \Var[X] + \Var[Y] + 2\E[(X - \E[X])(Y - \E[Y])]\\
+        &= \Var[X] + \Var[Y] + 2\E[X - \E[X]] \cdot \E[Y - \E[Y]]\\
+        &= \Var[X] + \Var[Y]
+    \end{align*}
+    since $X- \E[X]$ and $Y - \E[Y]$ are independent and $\E[X - \E[X]] = \E[X] - \E[X] = 0$ 
+\end{tbox}
+
+\begin{exercise}
+    \textbf{Exercise:} Calculate the variance of $X \sim G(p)$
+
+    Let $Y =1$ if the first trial is a success and $Y= 0$ otherwise. Then 
+    \begin{align*}
+        \E[X^2] &= \P(Y= 0) \E[X^2 \; | \; Y= 0] + \P(Y = 1) \E[X^2 \; | \;Y= 1]\\ 
+        &= (1 - p)\E[X^2 \; | \; Y= 0] + p\E[X^2 \; | \;Y= 1]
+    \end{align*}
+
+    If $Y = 0$, let $Z$ be the number of trials until the first success after the first trial. 
+    \begin{align*}
+        \E[X^2] &= (1 - p)\E[(z+1)^2] + p\\ 
+        &= (1 - p)\E[Z^2] + 2(1- p)\E[Z] + (1 - p) + p\\
+        &= (1 - p) \E[X^2] + 2(1 -p) \frac{1}{p} + 1\\ 
+        &= (1 - p) \E[X^2] + \frac{2-p}{p}\\
+        &= \frac{2-p}{p^2}
+    \Var[X] &= \E[X^2] - (\E[X])^2\\ 
+        &= \frac{2-p}{p^2} - \frac{1}{p^2}\\ 
+        &= \frac{1-p}{p^2}
+    \end{align*}
+    since $\E[Z] = 1/p$ and $\E[Z^2] = \E[X^2]$ by the memoryless property.
+\end{exercise}
+
+And all together, this does give us a tighter bound on the probability of being very unlucky in the coupon collector problem.
+\begin{align*}
+    \Var[X_i] &\leq \frac{1}{p^2}\\ 
+    &\leq \left(\frac{n}{n-i+1}\right)^2\\ 
+    \Var[X] &= \sum_{i=1}^{n} \Var[X_i]\\
+    &\leq \sum_{i=1}^n \left(\frac{n}{n-i+1}\right)^2\\
+    &= n^2 \sum_{i=1}^{n} \frac{1}{i^2}\\
+    &\leq n^2 \frac{\pi^2}{6} 
+\end{align*}
+since $\sum_{i=1}^{\infty} 1/i^2 = \pi^2/6$.
+
+By Chebyshev's inequality,
+\[\P(\abs{X - nH_n} \geq nH_n) \leq \frac{n^2 \pi^2}{6(nH_n)^2} = O\left(\frac{1}{\log^2 n}\right)\]
+
+Can we do even better? 
+
+Consider the probability of not hitting the $i$th bin after $n \log n + cn$ trials. This is
+\[\left(1 - \frac{1}{n}\right)^{n \log n + cn} < e^{-\log n + c}  = \frac{1}{e^c n}\]
+
+\tbf{Union Bound:} Let $E_1, \dots, E_n$ be any $n$ events in a probability space. Then
+\[\P\left(\bigcup_{i=1}^n E_i\right) \leq \sum_{i=1}^n \P(E_i)\]
+
+Hence, the probability of not hitting any bin after $n \log n + cn$ trials is at most $e^{-c}$. 
+
+The probability that all bins have not been hit after $2n \log n$ trials is at most $1/n$.
+
+And finally, the probability that all bins have not been hit after $n(\log n + 2\log \log n)$ trials is at most $O(1/\log^2 n)$.
+
+\section{Sept 29}
+
+A typical probability theory statement makes claims in the limit of trials. For example 
+\begin{proposition}
+    \textbf{Central Limit Theorem:} For $X_1,\, \dots,\, X_n$ independent and identically distributed random variables with mean $\mu$ and variance $\sigma^2$,
+    \[\lim_{n \to \infty} \P(\frac{1}{\sigma n\sqrt n} \sum_{i=1}^n (X_i - \mu) \leq z) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^z e^{-t^2/2} dt\] 
+\end{proposition}
+
+However, this tells us nothing about the speed of convergence. In probabilistic methods for CS, we are interested in \emph{finite sample approximation} and explicit, feasible bounds on the probability of error.
+
+\section{Sept 29}
+
+Notice that in our analysis of the quicksort algorithm, we could only talk about the expectation of the run time. We could not say anything about the probability of the run time being much larger than the expectation. Today, we will introduce \emph{large deviation bounds}.
+
+\begin{proposition}
+    \textbf{Chernoff (Large Deviation) Bound:} Let $X_1, \dots, X_n$ be independent Bernoulli random variables with $\P(X_i = 1) = \E[X_i] = p_i$. Let $\mu = \sum_{i=1}^n p_i$. Then for any $\delta > 0$,
+    \begin{enumerate}
+        \item \[\P\left(\frac{1}{n} \sum_{i=1}^n X_i \geq( 1 + \delta)\mu\right) \leq e^{-n\mu \delta^2/3}\]
+        \item \[\P\left(\frac{1}{n} \sum_{i=1}^n X_i \leq( 1 - \delta)\mu\right) \leq e^{-n\mu \delta^2/2}\]
+    \end{enumerate}
+    That is, the probability of a large deviation from the mean is exponentially small in $n$.
+\end{proposition}
+
+\tbf{Example:} Consider $n$ coin flips. Let $X$ be the number of heads. 
+\begin{itemize}
+    \item Markov gives 
+    \[\P(X \geq \frac{3n}{4} ) \leq \frac{n/2}{3n/4} \leq \frac{2}{3}\]
+    \item Chebyshev gives
+    \[\P\left(\abs{X - \frac{n}{2}} \geq \frac{n}{4}\right) \leq \frac{4}{n} \]
+    \item Chernoff gives
+    \[\P\left(\abs{X - \frac{n}{2}} \geq \frac{n}{4}\right) \leq \P\left(X \geq \frac{n}{2}(1 + \frac{1}{2})\right) +\P\left(X \geq \frac{n}{2}(1 - \frac{1}{2})\right) \leq 2e^{-n/24}\]
+
+\end{itemize}
+
+Notice that each of these bounds is successively tighter but uses more information about the distribution of $X$ (just the expectation, the variance, and everything). 
+
+The basic idea of the proof of the Chernoff bound is to use Markov's inequality on the moment generating function of $X$: for any $t > 0$
+\[\P(X \geq a) = \P(e^{tX} \ge e^{ta}) \leq \frac{\E[e^{tX}]}{e^{ta}}\]
+and similarly for $t < 0$:
+\[\P(X \leq a) = \P(e^{tX} \ge e^{ta}) \leq \frac{\E[e^{tX}]}{e^{ta}}\]
+
+Of course, the real challenge is to compute $\E[e^{tX}]$. 
+
+\begin{tbox}{\textbf{Theorem:} Let $X_1, \dots, X_n$ be independent Bernoulli random variables with $\P(X_i = 1) = p_i$. Let $X = \sum_{i=1}^n X_i$ and 
+\[\mu = \E[X] = \sum_{i=1}^n \E[X_i] = \sum_{i=1}^n p_i\]
+Then 
+\begin{enumerate}
+    \item For any $\delta > 0$, 
+    \[\P(X \geq (1 + \delta)\mu) \leq \left(\frac{e^{\delta}}{(1 + \delta)^{(1 + \delta)}}\right)^{\mu} \] 
+    \item For $0 < \delta < 1$,
+    \[\P(X \geq (1 + \delta)\mu) \leq e^{-\mu \delta^2/3}\] 
+    \[\P(X \leq (1 - \delta)\mu) \leq \left(\frac{e^{-\delta}}{(1-\delta)^{(1-\delta)}}\right)^{\mu} \leq  e^{-\mu \delta^2/2}\] 
+    \item For $R > 6\mu$,
+    \[\P(X \geq R) \leq 2^{-R}\]
+\end{enumerate}}
+
+\emph{Proof:} For each $X_i$, 
+\begin{align*}
+    M_{X_i}(t) &= \E[e^{tX_i}]\\
+    &= p_i e^t + (1 - p_i)\\
+    &= 1 + p_i(e^t - 1)\\
+    &\leq e^{p_i(e^t - 1)}
+\end{align*}
+since $X_i \in \{0, 1\}$ and $1 + x \leq e^x$ for all $x$.
+
+Notice that this is a function of $t$ since we took the expectation over $X_i$. 
+
+Now we can compute the moment generating function of $X$:
+\begin{align*}
+    M_X(t) &= \E\left[e^{tX}\right]\\
+    &= \E\left[\exp\left(t\sum_{i=1}^n X_i\right)\right] = \E\left[\prod_{i=1}^n e^{tX_i}\right] = \prod_{i=1}^n \E\left[e^{tX_i}\right]\\
+    &\leq \prod_{i=1}^n \exp\left(p_i(e^t - 1)\right)\\
+    &= \exp\left((e^t - 1)\sum_{i=1}^n p_i\right) = e^{(e^t - 1)\mu}
+\end{align*}
+
+Applying Markov's inequality for $t > 0$ gives 
+\begin{align*}
+    \P(X \geq (1 + \delta)\mu) &= \P(e^{tX} \geq e^{t(1 + \delta)\mu})\\
+    &\leq \frac{\E[e^{tX}]}{e^{t(1 + \delta)\mu}}\\
+    &\leq \frac{e^{(e^t - 1)\mu}}{e^{t(1 + \delta)\mu}}
+\end{align*}
+
+For any $\delta > 0$, we can set $t = \log(1 + \delta) > 0$ to get
+\[\P(X \geq (1 + \delta)\mu) \leq \left(\frac{e^{\delta}}{(1 + \delta)^{(1 + \delta)}}\right)^{\mu} \] 
+
+For $\delta > 0$, we can set $t  =\log(1 + \delta) > 0$ to get 
+\[\P(X \geq (1 + \delta)\mu) \leq \left(\frac{e^{\delta}}{(1+\delta)^{(1+\delta)}}\right)^{\mu}\] 
+
+This proves (1).
+
+\div
+
+For (2), we first show 
+\[\frac{e^{\delta}}{(1+ \delta)^{(1 + \delta)}} \leq e^{-\delta^2/3}\]
+or equivalently, that
+\[f(\delta) = \delta - (1 + \delta)\log(1 + \delta)+ \delta^2/3 \leq 0\]
+with $\delta \in (0, 1)$. 
+
+Since $f''(\delta) < 0$ for $\delta \in [0, 1/2)$ and $f''(\delta) > 0$ for $\delta \in [1/2, 1)$, we know $f'(\delta)$ first decreases then increases over $[0, 1]$. 
+
+Since $f'(0) = 0$ and $f'(1) < 0$, we have that $f'(\delta) \leq 0$. Finally, $f(0) = 0$ and $f$ is decreasing so $f(\delta) \leq 0$ in the interval, giving 
+\[\boxed{\P(X \geq (1 + \delta)\mu) \leq e^{-\mu \delta^2/3}}\] 
+
+
+On the other hand, using Markov for all $t < 0$, we have that 
+\[\P(X \leq (1- \delta)\mu) = \frac{e^{(e^{t} - 1)\mu}}{e^{t(1 - \delta)\mu}}\]
+by the same argument above. 
+
+On $0 < \delta < 1$, set $t = \log(1- \delta) < 0$ to get
+\[\P(X \leq (1 - \delta)\mu) \leq \left(\frac{e^{-\delta}}{(1-\delta)^{(1-\delta)}}\right)^{\mu}\] 
+Then by similar argument as above, we can show 
+\[f(\delta) = -\delta - (1 - \delta) \log(1 - \delta) + \frac{1}{2}\delta^2 \leq 0\]
+to get 
+\[\boxed{\P(X \leq (1 - \delta)\mu) \leq e^{-\mu \delta^2/2}}\]
+
+\hrule 
+
+For (3), with $R \geq 6\mu$ and $\delta\geq 5$, 
+\[\P(X \geq (1 +\delta)\mu) \leq \left(\frac{e^{\delta}}{(1+\delta)^{(1+\delta)}}\right)^{\mu} \leq \left(\frac{e}{6}\right)^R \leq 2^{-R}\] 
+
+This completes the proof. 
+\end{tbox}
+
+The coin flipping example above asks: how likely is it that we will see 3/4 heads in $n$ flips of a fair coin? In fact, we can get a much tighter bound using Chernoff:
+\begin{align*}
+    \P\left(\abs{X - \frac{n}{2}} \geq \frac{1}{2} \sqrt{6n \log n}\right) &= \P\left(X \geq \frac{n}{2} + \frac{1}{2} \sqrt{\frac{6\log n}{n}}\right) + \P\left(X \leq \frac{n}{2} - \frac{1}{2} \sqrt{\frac{6\log n}{n}}\right)\\ 
+    &\leq \exp\left(-\frac{1}{3} \frac{n}{2} \frac{6\log n}{n}\right) + \exp\left(-\frac{1}{2} \frac{n}{2} \frac{6\log n}{n}\right)\\
+    &\leq \frac{2}{n} 
+\end{align*}
+using the fact that $\sigma = \sqrt{n/4}$ and choosing our constants carefully. 
+
+The obvious question is: why are we choosing a deviation of $\sqrt{n \log n}$? 
+
+Simply, $\sqrt{n}$ is the order of the standard deviation of $X$ so we could not hope to get a bound on the probability of a deviation of order $\sqrt{n}$ that is better than $O(1)$. The $\log n$ factor is a well-chosen trick to get a bound that goes to zero as $n \to \infty$.
+
+\begin{proposition}
+    \textbf{Theorem:} Let $X_1, \dots, X_n$ be independent Bernoulli random variables with $\P(X_i = 1) = p_i$. Let $X = \sum_{i=1}^n X_i$ and $\mu = \E[X]$ then define $\bar X = \frac{1}{n} \sum_{i=1}^n X_i$ and $\bar \mu = \E[\bar X]$. 
+    
+    We showed above that 
+    \begin{align*}
+        \P(X \geq (1 + \delta)\mu) &\leq e^{-\mu \delta^2/3}\\ 
+        \P(X \leq (1 - \delta)\mu) &\leq e^{-\mu \delta^2/2}
+    \end{align*}
+
+    But additionally, 
+    \begin{align*}
+        \P(\bar X \geq (1 + \delta)\bar \mu) &\leq e^{-\bar \mu \delta^2/3}\\ 
+        \P(\bar X \leq (1 - \delta)\bar \mu) &\leq e^{-\bar \mu \delta^2/2}
+    \end{align*}
+
+\end{proposition}
+
+Notice the expectation is in the exponent. If, however, we have an RV with $0$ mean, this is useless! We will see next time a different Chernoff bound that does not depend on the expectation of $X$.
+
+
+\emph{Example (Monte Carlo Methods):} Estimate the value of $\pi$. 
+
+Choose $X, Y$ independently and uniformly at random in $[0, 1]$. Let 
+\[Z = \begin{cases}
+    1 & \sqrt{X^2 + Y^2} \leq 1\\ 
+    0 & \text{otherwise}
+\end{cases}\]
+
+Then $\frac{1}{2} \leq p = \P(Z = 1) = \frac{\pi}{4} \leq 1$ and $4\E[Z] = \pi$.
+
+Let $Z_1, \dots, Z_n$ be the values of $Z$ for $m$ independent experiments. Define $W_m = \sum_{i=1}^m Z_i$. 
+\[\E[W_m] = \sum_{i=1}^m \E[Z_i] = m \E[Z] = \frac{m\pi}{4}\]
+
+Then $\tilde \pi_m = \frac{4}{m} W_m$ is an\emph{ unbiased estimator }of $\pi$, that is $\E[\tilde \pi_m] = \pi$.
+
+How many samples do we need to get a good estimate of $\pi$?
+\begin{align*}
+    \P(\abs{\tilde \pi_m - \pi} \geq \ep\pi) &= \P\left(\abs{W - \frac{m\pi}{4}} \geq \frac{m\ep\pi}{4}\right)\\
+    &= \P(\abs{W_m - \E[W_m]} \geq \ep \E[W_m])\\ 
+    &= \P\left(W_m - \E[W_m] \geq \ep \E[W_m]\right) + \P\left(W_m - \E[W_m] \leq -\ep \E[W_m]\right)\\
+    &\leq \exp(-\frac{1}{3} \frac{m\pi}{4} \ep^2) + \exp(-\frac{1}{2} \frac{m \pi}{4}\ep^2)\\
+    &\leq 2\exp(-\frac{1}{12}m\pi \ep^2)
+\end{align*}
+
+But this is a problem! We don't know the value of $\pi$ in this expression!
+
+However, we can go back to geometry to bound $\pi > 2$ and get 
+\[\P(\abs{\tilde \pi_m - \pi} \geq \ep \pi) \leq 2\exp(-\frac{1}{12}m\pi \ep^2) \leq \exp(-\frac{1}{6}m \ep^2) = \delta\]
+So 
+\[6m\ep^2 \geq \log \frac{1}{\delta} \implies m \geq \frac{6\log(1/\delta)}{\ep^2} + o(1)\]
+but this is not ideal since $\ep \ll 1$ will make $m$ very large.
+
+For example, if we want an error $\leq 1\%$ ($\ep = 0.1$ and $\delta = 0.01$), we need $m \geq 4000$. 
+
+Let's return to the general scheme. For any random variable $X$, we can calculate large deviations bounds via 
+\begin{enumerate}
+    \item computing $\E[e^{tX}]$
+    \item optimize 
+    \begin{align*}
+        \P(X \geq a) &\leq \min_{t>0} \frac{\E[e^{tX}]}{e^{ta}}\\
+        \P(X \leq a) &\leq \min_{t<0} \frac{\E[e^{tX}]}{e^{ta}}
+    \end{align*}
+    \item simplify the resulting expression to get a nice bound
+\end{enumerate}
+
+It is worth exploring the moment generating function of $X$ in more detail.
+
+\tbf{Moment Generating Function:} For a random variable $X$, the moment generating function is defined for $t \in \R$ as
+\[M_X(t) = \E[e^{tX}]\]
+(though this depends on the expectation converging).
+
+\begin{tbox}{\textbf{Theorem:} Let $X$ be a random variable with moment generating function $M_X(t)$. Assuming that exchanging the expectation and differentiation is valid, then for all $n \geq 1$,
+    \[\E[X^n] = M_X^{(n)}(0)\]
+    where $M_X^{(n)}(0)$ is the $n$th derivative of $M_X(t)$ evaluated at $t = 0$.}
+    \emph{Proof:} 
+    \[M_X^{(n)}(t) = \E[X^n e^{tX}]\]
+    so 
+    \[M_X^{(n)}(0) = \E[X^n]\]
+\end{tbox}
+
+Notice in particular 
+\begin{itemize}
+    \item $M_x'(t) = \E[X e^{tX}]$ so $\E[X] = M_X'(0)$
+    \item $M_X''(t) = \E[X^2 e^{tX}]$ so $\E[X^2] = M_X''(0)$
+\end{itemize}
+which easily gives us the expectation and variance. 
+
+When can we switch the order of differentiation and expectation? This is largely out of scope but we can notice that 
+\[M_X(t) = \E[e^{tX}] = \sum_{i \in \text{dom}(X)} e^{t x_i} \cdot \P(X = i)\]
+Assuming the sum is finite or converges uniformly, we can differentiate term by term to get 
+\[M_X'(t) = \sum_{i \in \text{dom}(X)} \frac{d}{dt} e^{ti} \P(X = i) = \E[\frac{d}{dt} e^{ti}]\]
+
+
+\begin{tbox}{\textbf{Theorem:} Let $X, Y$ be independent random variables with moment generating functions $M_X(t), M_Y(t)$. Then the moment generating function of $X + Y$ is
+    \[M_{X + Y}(t) = M_X(t) \cdot M_Y(t)\]}
+    \emph{Proof:} 
+    \[M_{X+Y}(t) = \E[e^{t(X + Y)}] = \E[e^{tX}] \cdot \E[e^{tY}] = M_X(t) \cdot M_Y(t)\]
+\end{tbox}
+
+\begin{tbox}{\textbf{Theorem:} Let $X, Y$ be two random variables. If 
+    \[M_X(t) = M_Y(t)\]
+    for all $t\in (-\delta, \delta)$ for some $\delta > 0$, then $X$ and $Y$ have the same distribution.}
+    \emph{Proof:} Out of scope. 
+\end{tbox}
 \end{document}

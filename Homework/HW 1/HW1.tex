@@ -34,7 +34,7 @@
 \headheight 35pt
 \lhead{Milan Capoor}
 \chead{\textbf{\Large Homework \hwnumber}}
-\rhead{\course \\ September 17, 2026}
+\rhead{\course}
 \lfoot{}
 \cfoot{}
 \rfoot{\small\thepage}
@@ -72,9 +72,9 @@ show that any connected undirected graph $G$ on $n$ vertices has at most $\frac{
 \color{darkblue}
    From the analysis of the randomized Min-Cut algorithm, we know that the probability of finding a specific minimum cut in a connected undirected graph $G$ on $n$ vertices is  $\geq \frac{2}{n(n-1)}$.
 
-   Notice that finding a specific minimum cut is a mutually exclusive event from finding any other minimum cut. Thus, if there were $k \geq \frac{n(n-1)}{2}$ distinct min cuts, 
-   \[\sum_k \P(\text{finding min-cut } k) \geq \frac{n(n-1)}{2} \cdot \frac{2}{n(n-1)} = 1\]
-    which is a contradiction since the sum of probabilities of mutually exclusive events cannot exceed 1. 
+   Notice that finding a specific minimum cut is a mutually exclusive event from finding any other minimum cut. Thus, if there were $k > \frac{n(n-1)}{2}$ distinct min cuts, 
+   \[\sum_k \P(\text{finding min-cut } k) > \frac{n(n-1)}{2} \cdot \frac{2}{n(n-1)} = 1\]
+   which is a contradiction since the sum of probabilities of mutually exclusive events cannot exceed 1. 
 
     
 \color{black}
@@ -86,13 +86,9 @@ View the condition $Dr = 0$ in the proof of Freivalds' Algorithm for matrix mult
 \color{darkblue}
     Let $H_1, \dots, H_n$ be the $n$ linear multivariate polynomials of degree 1 over variables $r_1, \dots, r_n$ corresponding to the $n$ equations in the system $Dr = 0$.
 
-    Assume that $H_1, \dots, H_n$ are not all identically zero. Then by the Schwartz-Zippel Lemma, for each $i$, $\P(\mathcal{H}_i) := \P(H_i(r_1, \dots, r_n) = 0) \leq 1/\abs S$. So
-    \[\P(Dr = 0) = \P\left(\bigcap_{i=1}^n \mathcal{H}_i\right) = \prod_{i=1}^n \P(H_i(r_1, \dots, r_n) = 0) \leq \left(\frac{1}{\abs S}\right)^n \leq \frac{1}{\abs S}\]
+    $Dr$ is not identically zero so $\exists H_i$ a non-zero degree 1 polynomial. Then by Schwartz-Zippel and monotonicity of probability, we have that
+    \[\P(Dr = 0) \leq \P(H_i(r_1, \dots, r_n) = 0) \leq \frac{1}{\abs S}\]
 \color{black}
-
-
-
-
 
 \section*{Problem 4:}
 Consider the following algorithm for 
@@ -121,15 +117,15 @@ If $k\leq |S_1|$ return Select($S_1,k)$ else return Select($S_2,k-|S_1|$).
 \end{tcolorbox}
 
 We analyze the performance of the algorithm. Answer the following questions for $|S|=n$. You can ignore the cost of step 1 which is $O(1)$. 
-\begin{enumerate}
+\begin{enumerate}[a.]
 \item 
 We say that a call to Select$(S,k$) was {\it successful} if both $|S_1|\leq 2n/3$ and $|S_2|\leq 2n/3$. Prove that 
 the algorithm terminates after no more than $\log_{3/2} n$ successful calls.
 
-\color{red}
+\color{darkblue}
     Let $i$ be the number of successful calls. 
 
-    At $i = 1$, $S_1$ and $S_2$ partition $S$ into two sets of size at most $2n/3$. $y$ must be in one of these sets, so the next call to \tt{Select} will be on a set of size at most $2n/3$.
+    At $i = 1$, $S_1$ and $S_2$ partition $S$ into two sets of size at most $2n/3$. Since the sets never grow, the next call to \tt{Select} will be on a set of size at most $2n/3$.
 
     Then at $i =2$, we again partition the set into a two sets of size at most 
     \[\frac{2(2n/3)}{3} = \frac{4n}{9} = \left(\frac{2}{3}\right)^2 n\]
@@ -137,6 +133,9 @@ the algorithm terminates after no more than $\log_{3/2} n$ successful calls.
     Inductively, after $i$ successful calls, the size of the set on which \tt{Select} is called is at most 
     \[\frac{2}{3} \cdot \left(\frac{2}{3}\right)^{i-1} n = \left(\frac{2}{3}\right)^i n\]
 
+    Setting $i = \log_{3/2} n$, 
+    \[\left(\frac{2}{3}\right)^{\log_{3/2} n} n = \frac{1}{n} \cdot n = 1 \leq 24\]
+    so the call made after the $\log_{3/2} n$-th successful call (if the algorithm has not already stopped) is on a set of size less than $24$, terminating the algorithm without any further successful calls.
     
 \color{black}
 
@@ -144,12 +143,26 @@ the algorithm terminates after no more than $\log_{3/2} n$ successful calls.
 \item 
 Prove that a call to the algorithm if $|S|=n\geq 24$ is successful with probability $\geq 1/4$. [Hint: $2n/3$ may not be an integer. ]
 
-\color{red}
-    \begin{align*}
-        \P(\text{success}) &= \P(|S_1| \leq 2n/3 \text{ and } |S_2| \leq 2n/3)\\ 
-        &=\P(\#\{x \in S : x \leq y\} \leq 2n/3 \text{ and } \#\{x \in S : x > y\} \leq 2n/3)\\
-    \end{align*}
+\color{darkblue}
+    Suppose $y$ is the $s$-th smallest element in $S$. Then the call to the algorithm is successful if and only if $s \leq 2n/3$ and $n-s \leq 2n/3$.
+
+    As a system of inequalities, this is equivalent to
+    \[\frac{n}{3} \leq s \leq \frac{2n}{3}\]
+
+    Since $s$ is uniformly distributed over the integers $1, \dots, n$, 
+   \begin{align*}
+     \P(\text{success}) &= \frac{\lfloor 2n/3 \rfloor - \lceil n/3 \rceil + 1}{n}\\ 
+     &\geq \frac{(2n - 2)/3- (n + 2)/3 + 1}{n}\\ 
+     &= \frac{(n -4)/3 + 1}{n}\\ 
+     &= \frac{1}{3} - \frac{1}{3n} 
+   \end{align*}
+
+   Since $n \geq 24$, 
+   \[\P(\text{success}) \geq \frac{1}{3} - \frac{1}{72} = \frac{23}{72} > \frac{1}{4}\]
+   
     
+
+   
 \color{black}
 
 \item 
@@ -161,12 +174,37 @@ Argue (formally or informally) that for the analysis of the algorithm's runtime 
 if for any $j$ in the domain of $Y_i$ we have
 $$\Pr(\tilde{Y}_i \leq j) \geq \Pr(Y_i \leq j).$$  Show that this is the case here, and that it implies that $E[\tilde{Y_i}]\leq E[Y_i]$.]
 
-\color{red}
+\color{darkblue}
     First note, that $\P(Y_i \leq j)$ is just the CDF of a geometric random variable with parameter $p=1/4$:
     \[\P(Y_i \leq j) = 1 - \left(\frac{3}{4}\right)^{j} \]
     
     Then 
-    \[\P(\tilde Y_i \leq j) = \P(Y_i = 1) + \sum_{k=2}^j \P(Y_i = k \; | \; Y_i \geq k-1)\]
+    \begin{align*}
+        \P(\tilde Y_i \leq j) &= 1 - \P(\tilde Y_i > j)\\
+        &= 1 - \prod_{k=1}^j \P(\tilde Y_i \neq k \; | \; \tilde Y_i \neq 1, \dots, \tilde Y_i \neq k-1)
+    \end{align*}
+
+    However, for sets larger than 24, successive calls to algorithm fail with probability $\leq 3/4$ via part b, so
+    \[ \P(\tilde Y_i \leq j) \geq 1 - \prod_{k=1}^j \frac{3}{4} = 1 - \left(\frac{3}{4}\right)^{j} \] 
+
+    So finally,  
+    \begin{align*}
+        \P(\tilde Y_i \leq j) - \P(Y_i \leq j)  &\geq 1 - \left(\frac{3}{4}\right)^{j} - 1 + \left(\frac{3}{4}\right)^{j} = 0
+    \end{align*}
+    
+    Now it remains to show that $\E[\tilde Y_i] \leq \E[Y_i]$. 
+
+    Recall that for any non-negative random variable $X$,
+    \[\E[X] = \int_0^{\infty} (1 - F_X(x)) \; dx\]
+
+    In our case, we have shown that $F_{\tilde Y_i}(x) \geq F_{Y_i}(x)$ for all $x$, so
+    \begin{align*}
+        \E[\tilde Y_i] &= \int_0^{\infty} (1 - F_{\tilde Y_i}(x)) \; dx\\
+        &\leq \int_0^{\infty} (1 - F_{Y_i}(x)) \; dx\\
+        &= \E[Y_i]
+    \end{align*}
+
+
 \color{black}
 
 We continue the analysis assuming that for all $i$, the number of calls 
@@ -178,9 +216,9 @@ Let $X_i$ be the number of comparisons between the $i$-th successful call (exclu
 \color{darkblue}
     First, by definition of a geometric random variable, $E[Y_i] = 1/p = 4$. 
 
-    Hence, by part 3, it suffices to show that $X_i$ is bounded by $n\left(\frac{2}{3}\right)^i Y_i$.
+    Hence, by part (c), it suffices to show that $X_i$ is bounded by $n\left(\frac{2}{3}\right)^i Y_i$.
 
-    Then, recall from part 1 that $n\left(\frac{2}{3}\right)^i$ is the size of the set on which \tt{Select} is called after $i$ successful calls. Since each call to \tt{Select} requires at most $n\left(\frac{2}{3}\right)^i$ comparisons, and there are at most $Y_i$ calls between the $i$-th and $i+1$-th successful calls, we have that
+    Then, recall from part (a) that $n\left(\frac{2}{3}\right)^i$ is the size of the set on which \tt{Select} is called after $i$ successful calls. Since each call to \tt{Select} requires at most $n\left(\frac{2}{3}\right)^i$ comparisons, and there are at most $Y_i$ calls between the $i$-th and $i+1$-th successful calls, we have that
     \[X_i \leq n\left(\frac{2}{3}\right)^i Y_i\]
 \color{black}
 
@@ -193,7 +231,7 @@ We continue the analysis assuming that $X_i = n(2/3)^i Y_i$.
         \E[X] &= \sum_{i \geq 1} \E[X_i]\\ 
         &\leq \sum_{i \geq 1} 4n(2/3)^i\\
         &= 4n \sum_{i \geq 1} (2/3)^i\\
-        &= 4n \cdot \frac{1}{1 - 2/3}\\ 
+        &\leq 4n \cdot \frac{1}{1 - 2/3}\\ 
         &= 4n \cdot 3 = 12n
     \end{align*}
 \color{black}
@@ -203,19 +241,25 @@ We continue the analysis assuming that $X_i = n(2/3)^i Y_i$.
 \color{darkblue}
     \begin{align*}
         \Var[Y_i] &= \frac{1-p}{p^2} = \frac{3/4}{(1/4)^2} = 12\\
-        \Var[X_i] &= n^2 (2/3)^{2i} \Var[Y_i]\\ 
+        \Var[X_i] &= \E[X_i^2] - \E[X_i]^2\\
+        &= \E[n^2(2/3)^{2i} Y_i^2] - (4n(2/3)^i)^2\\
+        &= n^2(2/3)^{2i} \Var[Y_i]\\
         &= 12 n^2 (2/3)^{2i}
     \end{align*}
 \color{black}
 
 \item Prove that $Var[X]\leq \sum_{i=0}^{\log_{3/2}n}  n^{2} (2/3)^{2i}  Var[Y_i] \leq 21.6 n^{2} $ 
 
-\color{red}
+\color{darkblue}
     \begin{align*}
         \Var X &= \Var\left(\sum_{i \geq 1} X_i\right)\\
-        &= \sum_{i \geq 1} \Var[X_i]\\
-        &= \sum_{i \geq 1} 12n^2 (2/3)^{2i}\\
+        &\leq \sum_{i \geq 1} \Var[X_i]\\
+        &= \sum_{i \geq 1} n^2 (2/3)^{2i} \Var[Y_i]\\
         &= \sum_{i = 1}^{\lfloor\log_{3/2} n\rfloor} 12n^2 (2/3)^{2i} + \sum_{i = \lfloor\log_{3/2} n\rfloor + 1}^{\infty} 12n^2 (2/3)^{2i}\\
+        &\leq \sum_{i = 0}^{\log_{3/2} n} 12n^2 (2/3)^{2i} && (\text{at most } \log_{3/2} n \text{ successful calls})\\ 
+        &= \frac{12}{5} (9n^2 - 4)\\ 
+        &= 21.6n^2 - 9.6\\ 
+        &\leq 21.6 n^2
     \end{align*}
 \color{black}
 
